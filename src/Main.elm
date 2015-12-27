@@ -1,15 +1,13 @@
-module Main where
 
--- MODEL
-
-type alias Model = { }
+import TestList exposing (init, update, view)
+import StartApp.Simple exposing (start)
 
 
--- UPDATE
+main =
+  start
+    { model = init
+    , update = update
+    , view = view
+    }
 
-type Action = Reset
 
-update : Action -> Model -> Model
-update action model =
-  case action of
-    Reset -> model
