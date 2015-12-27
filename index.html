@@ -1,11 +1,31 @@
 <head>
   <title>Elm Reactor</title>
   <script src="elm.js" charset="utf-8"></script>
+  <script src="tests.js" charset="utf-8"></script>
 </head>
 <body>
   <script type="text/javascript">
-    window.addEventListener("DOMContentLoaded", function (){
-      Elm.fullscreen(Elm.Main, { });
-    })
+    var fs =  Elm.fullscreen(Elm.Main, { });
+    // window.addEventListener("DOMContentLoaded", function (){
+    //   Elm.fullscreen(Elm.Main, { });
+    // })
+
+    function runTest(test, target) {
+      var test = generateDummyTest();
+
+    }
+
+    /*
+    v = document.getElementById('elm-stamps');
+    var stamps = Elm.embed(Elm.Stamps, div, {reset:[]});
+    */
+
+    // You can send and receive values through
+    // ports 'reset' and 'count'.
+    // stamps.ports.reset.send([]);
+    fs.ports.starttests.subscribe(function(event) {
+       // run the tests.
+       console.log(event.value);
+    });
   </script>
 </body>
