@@ -9,7 +9,7 @@ import Html.Events exposing (..)
 -- MODEL
 
 type alias Model =
-    { Tests : List ( ID, Test.Model )
+    { tests : List ( ID, Test.Model )
     , nextID : ID
     }
 
@@ -18,7 +18,7 @@ type alias ID = Int
 
 init : Model
 init =
-    { Tests = []
+    { tests = []
     , nextID = 0
     }
 
@@ -26,45 +26,43 @@ init =
 -- UPDATE
 
 type Action
-    = Insert
-    | Remove
+    = StartTests
     | Modify ID Test.Action
 
 
 update : Action -> Model -> Model
 update action model =
   case action of
-    Insert ->
+    StartTests ->
+      -- start the tests!
+      {-
       let newTest = ( model.nextID, Test.init 0 )
-          newTests = model.Tests ++ [ newTest ]
+          newTests = model.tests ++ [ newTest ]
       in
           { model |
-              Tests = newTests,
+              tests = newTests,
               nextID = model.nextID + 1
           }
-
-    Remove ->
-      { model | Tests = List.drop 1 model.Tests }
-
-    Modify id TestAction ->
-      let updateTest (TestID, TestModel) =
-              if TestID == id then
-                  (TestID, Test.update TestAction TestModel)
+      -}
+      model
+    Modify id testAction ->
+      let updateTest (testID, testModel) =
+              if testID == id then
+                  (testID, Test.update testAction testModel)
               else
-                  (TestID, TestModel)
+                  (testID, testModel)
       in
-          { model | Tests = List.map updateTest model.Tests }
+          { model | tests = List.map updateTest model.tests }
 
 
 -- VIEW
 
 view : Signal.Address Action -> Model -> Html
 view address model =
-  let Tests = List.map (viewTest address) model.Tests
-      remove = button [ onClick address Remove ] [ text "Remove" ]
-      insert = button [ onClick address Insert ] [ text "Add" ]
+  let tests = List.map (viewTest address) model.tests
+      start = button [ onClick address StartTests ] [ text "Start Tests" ]
   in
-      div [] ([remove, insert] ++ Tests)
+      div [] ([start] ++ tests)
 
 
 viewTest : Signal.Address Action -> (ID, Test.Model) -> Html

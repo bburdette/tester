@@ -3,6 +3,7 @@ module Test (Model, init, Action, update, view) where
 import Html exposing (..)
 import Html.Attributes exposing (style)
 import Html.Events exposing (onClick)
+import Effects exposing (Effects, Never)
 
 
 -- MODEL
@@ -14,39 +15,42 @@ type TestStatus = NotStartedYet |
                   Passed |  
                   Failed
 
-type alias Model = Int
+tsToString : TestStatus -> String
+tsToString ts = 
+  case ts of 
+    NotStartedYet -> "test not started! " 
+    Running -> "test is running." 
+    Passed -> "test passed."
+    Failed -> "test failed."
 
-init : Int -> Model
-init count = count
+
+type alias Model = { status: TestStatus } 
+
+init : TestStatus -> Model
+init ts = Model ts 
 
 -- UPDATE
 
-type Action = Increment | Decrement
+type Action = TestUpdate TestStatus 
 
 
 update : Action -> Model -> Model
 update action model =
   case action of
-    Increment ->
-      model + 1
-
-    Decrement ->
-      model - 1
-
+    TestUpdate ts -> 
+      { model | status = ts }
 
 -- VIEW
 
 view : Signal.Address Action -> Model -> Html
 view address model =
   div []
-    [ button [ onClick address Decrement ] [ text "-" ]
-    , div [ countStyle ] [ text (toString model) ]
-    , button [ onClick address Increment ] [ text "+" ]
+    [ div [ statusStyle ] [ text (tsToString model.status) ]
     ]
 
 
-countStyle : Attribute
-countStyle =
+statusStyle : Attribute
+statusStyle =
   style
     [ ("font-size", "20px")
     , ("font-family", "monospace")
