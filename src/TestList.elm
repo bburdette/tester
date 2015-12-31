@@ -6,11 +6,12 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Signal
 import Effects
+import Task
 
 -- MODEL
 
 type alias Model =
-    { startmbx: Signal.Mailbox () 
+    { startaddr: Signal.Address () 
     , tests : List ( ID, Test.Model )
     , nextID : ID
     }
@@ -18,21 +19,24 @@ type alias Model =
 type alias ID = Int
 
 
-init : Signal () -> Model
-init sig =
-    { startmbx = Signal.mailbox sig
-    , tests = []
-    , nextID = 0
-    }
+init : Signal.Address () -> (Model, Effects.Effects Action)
+init addr = (Model addr [] 0, Effects.none)
+{-
+init : Signal.Mailbox () -> (Model, Effects.Effects Action)
+init mbx = (Model mbx [] 0, Effects.none)
 
+  { startmbx= Signal.mailbox sig
+  , tests= List.empty
+  , nextID= 0
+  }
+-}
 
 -- UPDATE
 
 type Action
     = StartTests
     | Modify ID Test.Action
-
-
+    | Dummy
 
 update : Action -> Model -> (Model, Effects.Effects Action)
 update action model =
@@ -40,7 +44,6 @@ update action model =
     StartTests ->
       -- start the tests!
       -- let mbx = Signal.mailbox model.startsig in
-      
       {-
       let newTest = ( model.nextID, Test.init 0 )
           newTests = model.tests ++ [ newTest ]
@@ -50,7 +53,10 @@ update action model =
               nextID = model.nextID + 1
           }
       -}
-      (model, Signal.send model.mbx ())
+      (model, Effects.task  
+        (Task.andThen 
+          (Signal.send model.startaddr ())
+          (\_ -> Task.succeed Dummy)))
     Modify id testAction ->
       let updateTest (testID, testModel) =
               if testID == id then
@@ -60,6 +66,8 @@ update action model =
       in
          ({ model | tests = List.map updateTest model.tests },
           Effects.none)
+    Dummy -> (model, Effects.none)
+        
 
 
 -- VIEW

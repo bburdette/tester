@@ -1,14 +1,21 @@
 
-import TestList exposing (init, update, view)
-import StartApp.Simple exposing (start)
+import TestList 
+--import StartApp.Simple exposing (start)
+import StartApp exposing (start)
+import Signal  
 
-port starttests : Signal () 
+port starttests : Signal ()
+port starttests = mbx.signal 
+
+mbx = Signal.mailbox ()
 
 main =
-  start
-    { model = init starttests
-    , update = update
-    , view = view
-    }
+  (start
+    { init = TestList.init mbx.address 
+    , update = TestList.update
+    , view = TestList.view
+    , inputs = []
+    }).html
+
 
 
