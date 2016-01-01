@@ -22,15 +22,6 @@ type alias ID = Int
 
 init : Signal.Address () -> (Model, Effects.Effects Action)
 init addr = (Model addr [] 0 0, Effects.none)
-{-
-init : Signal.Mailbox () -> (Model, Effects.Effects Action)
-init mbx = (Model mbx [] 0, Effects.none)
-
-  { startmbx= Signal.mailbox sig
-  , tests= List.empty
-  , nextID= 0
-  }
--}
 
 -- UPDATE
 
@@ -44,19 +35,6 @@ update action model =
   case action of
     StartTests ->
       -- start the tests!
-      -- let mbx = Signal.mailbox model.startsig in
-      {-
-      let newTest = ( model.nextID, Test.init 0 )
-          newTests = model.tests ++ [ newTest ]
-      in
-          { model |
-              tests = newTests,
-              nextID = model.nextID + 1
-          }
-     
-      (model, Effects.task (Task.succeed Dummy))
-      ({ model | clicks = 12 }, Effects.task (Task.succeed Dummy))
-      -}
       (model, Effects.task  
         (Task.andThen 
           (Signal.send model.startaddr ())
@@ -71,8 +49,7 @@ update action model =
          ({ model | tests = List.map updateTest model.tests },
           Effects.none)
     Dummy -> 
-      -- this never happens!!
-      ({ model | clicks = model.clicks + 1}, Effects.none)
+      (model, Effects.none)
         
 
 
@@ -81,9 +58,7 @@ update action model =
 view : Signal.Address Action -> Model -> Html
 view address model =
   let tests = List.map (viewTest address) model.tests
-      -- start = button [ onClick model.startaddr () ] [ text (toString model.clicks) ]
-      start = button [ onClick address StartTests ] [ text (toString model.clicks) ]
-      -- start = button [ onClick address StartTests ] [ text "Start Tests" ]
+      start = button [ onClick address StartTests ] [ text "Start Tests" ]
   in
       div [] ([start] ++ tests)
 
