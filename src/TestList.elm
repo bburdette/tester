@@ -14,13 +14,14 @@ type alias Model =
     { startaddr: Signal.Address () 
     , tests : List ( ID, Test.Model )
     , nextID : ID
+    , clicks: Int
     }
 
 type alias ID = Int
 
 
 init : Signal.Address () -> (Model, Effects.Effects Action)
-init addr = (Model addr [] 0, Effects.none)
+init addr = (Model addr [] 0 0, Effects.none)
 {-
 init : Signal.Mailbox () -> (Model, Effects.Effects Action)
 init mbx = (Model mbx [] 0, Effects.none)
@@ -52,6 +53,9 @@ update action model =
               tests = newTests,
               nextID = model.nextID + 1
           }
+     
+      (model, Effects.task (Task.succeed Dummy))
+      ({ model | clicks = 12 }, Effects.task (Task.succeed Dummy))
       -}
       (model, Effects.task  
         (Task.andThen 
@@ -66,7 +70,9 @@ update action model =
       in
          ({ model | tests = List.map updateTest model.tests },
           Effects.none)
-    Dummy -> (model, Effects.none)
+    Dummy -> 
+      -- this never happens!!
+      ({ model | clicks = model.clicks + 1}, Effects.none)
         
 
 
@@ -75,7 +81,9 @@ update action model =
 view : Signal.Address Action -> Model -> Html
 view address model =
   let tests = List.map (viewTest address) model.tests
-      start = button [ onClick address StartTests ] [ text "Start Tests" ]
+      -- start = button [ onClick model.startaddr () ] [ text (toString model.clicks) ]
+      start = button [ onClick address StartTests ] [ text (toString model.clicks) ]
+      -- start = button [ onClick address StartTests ] [ text "Start Tests" ]
   in
       div [] ([start] ++ tests)
 
