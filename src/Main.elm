@@ -4,10 +4,10 @@ import TestList
 import StartApp exposing (start)
 import Signal  
 
+mbx = Signal.mailbox ()
+
 port starttests : Signal ()
 port starttests = mbx.signal 
-
-mbx = Signal.mailbox ()
 
 main =
   (start
