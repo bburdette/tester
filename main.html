@@ -5,7 +5,10 @@
 </head>
 <body>
   <script type="text/javascript">
-    var fs =  Elm.fullscreen(Elm.Main, { testIncome: 0 });
+
+    var mt = { count: 0, descriptions: [] };
+
+    var fs =  Elm.fullscreen(Elm.Main, { testInit: mt });
 
     function runTest(index, test) { 
       test(function(result) { 
@@ -16,7 +19,13 @@
     fs.ports.starttests.subscribe(function(event) {
       console.log("test count: " + tests.length); 
 
-      fs.ports.testIncome.send(tests.length);
+      // descriptions.
+      dees = []; 
+      for (i = 0; i < tests.length; i = i + 1)
+      {
+        dees[i] = tests[i].description;
+      }
+      fs.ports.testInit.send({ count: tests.length, descriptions: dees });
 
       // run the tests.
       for (i = 0; i < tests.length; i = i + 1)

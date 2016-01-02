@@ -1,4 +1,4 @@
-module Test (Model, init, Action, update, view) where
+module Test (Model, init, Action, TestStatus(Running), update, view) where
 
 import Html exposing (..)
 import Html.Attributes exposing (style)
@@ -24,10 +24,13 @@ tsToString ts =
     Failed -> "test failed."
 
 
-type alias Model = { status: TestStatus } 
+type alias Model = 
+  { description: String 
+  , status: TestStatus 
+  } 
 
-init : TestStatus -> Model
-init ts = Model ts 
+init : String -> TestStatus -> Model
+init desc ts = Model desc ts 
 
 -- UPDATE
 
@@ -45,7 +48,8 @@ update action model =
 view : Signal.Address Action -> Model -> Html
 view address model =
   div []
-    [ div [ statusStyle ] [ text (tsToString model.status) ]
+    [ div [ statusStyle ] 
+      [ (text model.description), (text (tsToString model.status)) ]
     ]
 
 

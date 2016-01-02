@@ -1,6 +1,6 @@
 module TestList where
 
-import Test
+import Test exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -24,11 +24,15 @@ init : Signal.Address () -> (Model, Effects.Effects Action)
 init addr = (Model addr [] 0 0, Effects.none)
 
 -- UPDATE
+type alias InitStuff = 
+  { count: Int
+  , descriptions: List String
+  }
 
 type Action
     = StartTests
     | Modify ID Test.Action
-    | InitTests Int
+    | InitTests InitStuff
     | Dummy
 
 update : Action -> Model -> (Model, Effects.Effects Action)
@@ -40,8 +44,11 @@ update action model =
         (Task.andThen 
           (Signal.send model.startaddr ())
           (\_ -> Task.succeed Dummy)))
-    InitTests count -> 
-      ({model | count = count }, Effects.none)
+    InitTests initstuff ->
+      let l = List.length initstuff.descriptions
+          tests = List.map2 (\i d -> (i, Test.init d Test.Running)) 
+                     [1..l] initstuff.descriptions in  
+      ({model | count = initstuff.count, tests = tests }, Effects.none)
     Modify id testAction ->
       let updateTest (testID, testModel) =
               if testID == id then
