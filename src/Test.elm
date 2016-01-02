@@ -1,4 +1,4 @@
-module Test (Model, init, Action, TestStatus(Running), update, view) where
+module Test (Model, init, Action(TestUpdate), TestStatus(Running,Passed,Failed), update, view) where
 
 import Html exposing (..)
 import Html.Attributes exposing (style)

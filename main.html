@@ -7,12 +7,24 @@
   <script type="text/javascript">
 
     var mt = { count: 0, descriptions: [] };
+    var ng = { index: 0, state: "" }; 
 
-    var fs =  Elm.fullscreen(Elm.Main, { testInit: mt });
+    var fs =  Elm.fullscreen(Elm.Main, 
+      { testInit: mt
+      , testUpdate: ng 
+      });
 
     function runTest(index, test) { 
       test(function(result) { 
-        console.log("result: " + result);
+        var state = ""
+          if (result) {
+            state = "pass"
+          }
+          else {
+            state = "fail"
+          }
+        fs.ports.testUpdate.send({ index: index, state: state });
+        console.log("result: " + index + " " + result);
       } );
     } 
 
