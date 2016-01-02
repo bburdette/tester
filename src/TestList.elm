@@ -14,7 +14,7 @@ type alias Model =
     { startaddr: Signal.Address () 
     , tests : List ( ID, Test.Model )
     , nextID : ID
-    , clicks: Int
+    , count: Int
     }
 
 type alias ID = Int
@@ -28,6 +28,7 @@ init addr = (Model addr [] 0 0, Effects.none)
 type Action
     = StartTests
     | Modify ID Test.Action
+    | InitTests Int
     | Dummy
 
 update : Action -> Model -> (Model, Effects.Effects Action)
@@ -39,6 +40,8 @@ update action model =
         (Task.andThen 
           (Signal.send model.startaddr ())
           (\_ -> Task.succeed Dummy)))
+    InitTests count -> 
+      ({model | count = count }, Effects.none)
     Modify id testAction ->
       let updateTest (testID, testModel) =
               if testID == id then

@@ -11,12 +11,14 @@ mbx = Signal.mailbox ()
 port starttests : Signal ()
 port starttests = mbx.signal 
 
+port testIncome : Signal Int
+
 app =
   start
     { init = TestList.init mbx.address 
     , update = TestList.update
     , view = TestList.view
-    , inputs = []
+    , inputs = [Signal.map (\i -> TestList.InitTests i) testIncome]
     }
 
 main = app.html
